@@ -1,7 +1,21 @@
-/// To Do List Program
-// Copyright Conarium Software 2023
-// @auth J. O'Leary
+// TODO list program //
+// written and maintained by J. O'Leary
+// Contact me: josh@conarium.software
+// last revision: April 10, 2023
+// Copyright Conarium Software LLC - Licensed under GPL3
+// See README.txt for further information.
 
+// Compilation //
+
+// Usage //
+
+// Changelog //
+// April 10, 2023
+// added --urgent and --important flags
+// added --tag <tag> flag
+// implement tag display
+
+// Source //
 #include <iostream>
 #include <fstream>
 #include <ctime>
@@ -70,21 +84,32 @@ std::string rebuild_args_to_sentence(std::vector<std::string> args)
 #define YELLOW_LIMIT 7
 #define GREEN_LIMIT 1
 
-void output_line(const char* colorcode, std::string timestamp, std::string age, std::string text)
+void output_line(const char* colorcode, std::string timestamp, std::string age, std::string text, std::string tag)
 {
- std::cout << BOLD << colorcode  << "[" << timestamp << "] [" << age << "] "<< FG_WHITE  << text << std::endl;
+	std::cout << BOLD << colorcode  << "[" << timestamp << "] [" << age << "] ";
+	if (tag.size() > 0)
+	{
+		if (tag == "URGENT")
+			std::cout << FG_RED;
+		if (tag == "IMPORTANT")
+			std::cout << FG_YELLOW;
+
+		std::cout << "(" << tag << ") ";
+	}
+	std::cout << FG_WHITE << text << std::endl;
 }
+
 void output_list(std::string file_path)
 {
 	// Find, Parse, Output the todo list
 	std::ifstream file(file_path);
 
-    // is the file empty?
-    if (file.peek() == std::ifstream::traits_type::eof())
-    {
-        std::cout << "No tasks on the TODO list!" << std::endl;
-        return;
-    }
+    	// is the file empty?
+    	if (file.peek() == std::ifstream::traits_type::eof())
+    	{
+        	std::cout << "No tasks on the TODO list!" << std::endl;
+        	return;
+    	}
 	// Read each line from the file and parse it into a TODO.
 	std::string str;
 	while (std::getline(file, str)) {
@@ -93,18 +118,21 @@ void output_list(std::string file_path)
 		nlohmann::json token = nlohmann::json::parse(str);
 		std::string timestamp = token["timestamp"].get<std::string>();
 		std::string text = token["text"].get<std::string>();
-		std::string ag = token["tag"].get<std::string>();
+		std::string tag = token["tag"].get<std::string>();
 		// Calculate age (in days) of the TODO
 		int age = get_timestamp_age(timestamp);
 		// TODO: Make timeline configurable.
 		// Create timestamp string
 		std::string days_counter = std::to_string(age) + " days ago";
 
-		if      (age > MAGENTA_LIMIT) { output_line(FG_MAGENTA, timestamp, days_counter, text); }
-		else if (age > RED_LIMIT)     { output_line(FG_RED,     timestamp, days_counter, text); }
-		else if (age > YELLOW_LIMIT)  { output_line(FG_YELLOW,  timestamp, days_counter, text); }
-		else if (age > GREEN_LIMIT)   { output_line(FG_GREEN,   timestamp, days_counter, text); }
-		else                          { output_line(FG_BLUE,    timestamp, days_counter, text); }
+		auto colorcode = FG_BLUE;
+		if      (age > MAGENTA_LIMIT) { colorcode = FG_MAGENTA; }
+		else if (age > RED_LIMIT)     { colorcode = FG_RED;     }
+		else if (age > YELLOW_LIMIT)  { colorcode = FG_YELLOW;  }
+		else if (age > GREEN_LIMIT)   { colorcode = FG_GREEN;   }
+		else                          { colorcode = FG_BLUE;    }
+
+		output_line(colorcode, timestamp, days_counter, text, tag);
 	}
 	file.close();
 	std::cout << RESET_ALL;
@@ -124,11 +152,23 @@ void append_to_list(std::string file_id, std::string current_timestamp, std::str
 
 int main(int argc, char ** argv)
 {
+
 	// System Variables
 	std::string current_timestamp = get_current_timestamp_str();
 	std::string home_dir = getenv("HOME");
-	std::string file_id = home_dir + "/" + FILENAME;
 
+	// Look for config
+	std::string config_path = home_dir + "/" + ".todo.cfg.json";
+	std::ifstream config(config_path);
+
+	if (config.peek() == std::ifstream::traits_type::eof())
+	{
+		// No Config Yet, so we need to generate one
+		// Presumably the first time the software is used, so let's
+		// also show some help info?
+	}
+
+	std::string file_id = home_dir + "/" + FILENAME;
 	std::vector<std::string> args_list(argv + 1, argv + argc);
 
 	// Check for option flags to parse out. (--<flag>)
