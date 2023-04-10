@@ -59,13 +59,16 @@ int get_timestamp_age(const std::string timestamp)
     const auto difference = std::chrono::duration_cast<std::chrono::days>(now-tp).count();
     return difference;
 }
+
 bool matches(const std::string needle, std::vector<std::string> haystack)
 {
 	return std::find(haystack.begin(), haystack.end(), needle) != haystack.end();
 }
+
 void show_help()
 {
 	std::cout << "To Do List Program by Conarium Software" << std::endl;
+	std::cout << "Usage: todo " << std::endl;
 }
 
 std::string rebuild_args_to_sentence(std::vector<std::string> args)
@@ -78,6 +81,7 @@ std::string rebuild_args_to_sentence(std::vector<std::string> args)
 	}
 	return sentence;
 }
+
 #define FILENAME ".todo.txt"
 #define MAGENTA_LIMIT 21
 #define RED_LIMIT 14
@@ -138,11 +142,11 @@ void output_list(std::string file_path)
 	std::cout << RESET_ALL;
 }
 
-void append_to_list(std::string file_id, std::string current_timestamp, std::string content){
+void append_to_list(std::string file_id, std::string current_timestamp, std::string content, std::string tag){
 	nlohmann::json token = {
 		{"text", content},
 		{"timestamp", current_timestamp},
-		{"tag", ""},
+		{"tag", tag},
 	};
 	std::ofstream file(file_id, std::ios_base::app);
 	file << token.dump() << std::endl;
@@ -150,9 +154,10 @@ void append_to_list(std::string file_id, std::string current_timestamp, std::str
 	std::cout << "Added to TODO list!" << std::endl;
 }
 
+// TODO: Refactor into class
+
 int main(int argc, char ** argv)
 {
-
 	// System Variables
 	std::string current_timestamp = get_current_timestamp_str();
 	std::string home_dir = getenv("HOME");
@@ -164,12 +169,14 @@ int main(int argc, char ** argv)
 	if (config.peek() == std::ifstream::traits_type::eof())
 	{
 		// No Config Yet, so we need to generate one
-		// Presumably the first time the software is used, so let's
+		// Presumably the first time the software is used
 		// also show some help info?
 	}
 
 	std::string file_id = home_dir + "/" + FILENAME;
 	std::vector<std::string> args_list(argv + 1, argv + argc);
+
+	std::string tag = "";
 
 	// Check for option flags to parse out. (--<flag>)
 	// Flags are removed from args_list at this point.
@@ -191,14 +198,33 @@ int main(int argc, char ** argv)
 			file_id = FILENAME;
            		continue;
 		}
+		if (matches(args_list[i], {"--urgent"}))
+		{
+			args_list.erase(args_list.begin()+i);
+			tag = "URGENT";
+			continue;
+		}
+		if (matches(args_list[i], {"--important"}))
+		{
+			args_list.erase(args_list.begin()+i);
+			tag = "IMPORTANT";
+			continue;
+		}
+		if (matches(args_list[i], {"--tag"}))
+		{
+			tag = args_list[i+1];
+			args_list.erase(args_list.begin()+i);
+			args_list.erase(args_list.begin()+i);
+			continue;
+		}
 	}
 
 	// Run the program with cherry-picked args_list
-	if (args_list.size() < 1) { 
+	if (args_list.size() < 1) {
 		output_list(file_id);
        	} else {
 		std::string item = rebuild_args_to_sentence(args_list);
-		append_to_list(file_id, get_current_timestamp_str(), item);
+		append_to_list(file_id, get_current_timestamp_str(), item, tag);
 		return 0;
 	}
 	return 0;
