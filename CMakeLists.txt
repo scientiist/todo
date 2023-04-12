@@ -4,4 +4,4 @@ project(todo)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(todo main.cpp colors.h json.h)
+add_executable(todo main.cpp TodoApp.h colors.h json.h)
