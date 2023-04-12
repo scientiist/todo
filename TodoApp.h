@@ -1,3 +1,11 @@
+// TodoApp.h
+// Implementation of TodoList Console App.
+// Reads input, processes arguments and options, and outputs results.
+// @auth J. O'Leary
+// @edit 12 April 2023
+// @copyright Conarium Software LLC
+// @license GPL3
+
 #pragma once
 #include <string>
 #include <vector>
@@ -11,6 +19,7 @@
 #include "json.h"
 
 #define VERSION "1.2"
+#define TIMESTAMP_FORMAT "%Y-%m-%d %H:%M:%S"
 
 using std::chrono_literals::operator""h;
 using timestamp = std::chrono::time_point<std::chrono::system_clock>;
@@ -20,15 +29,15 @@ std::string timestamp_to_string(const timestamp time)
 {
 	auto in_time_t = std::chrono::system_clock::to_time_t(time);
 	std::stringstream ss;
-	ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %H:%M:%S");
+	ss << std::put_time(std::localtime(&in_time_t), TIMESTAMP_FORMAT);
 	return ss.str();
 }
 
 const timestamp string_to_timestamp(std::string time_str)
 {
 	std::tm tm = {};
-	strptime(time_str.c_str(), "%Y-%m-%d %H:%M:%S", &tm);
-	// the -1h is a lazy hack to hotfix timezones incrementing the hour?
+	strptime(time_str.c_str(), TIMESTAMP_FORMAT, &tm);
+	// the -1h is a lazy hack to hotfix timezones incrementing the hour
 	return std::chrono::system_clock::from_time_t(std::mktime(&tm))-1h;
 }
 
@@ -68,23 +77,7 @@ std::string rebuild_args_to_sentence(std::vector<std::string> args)
 #define YELLOW_LIMIT 7
 #define GREEN_LIMIT 1
 
-// TODO: Create TodoEntry class
-class TodoEntry
-{
-public:
-protected:
-private:
-};
-
-class ConsoleApp
-{
-public:
-protected:
-private:
-};
-
-
-class TodoApp : ConsoleApp
+class TodoApp
 {
 public:
 	std::string working_dir;
@@ -253,11 +246,23 @@ void TodoApp::ShowVersionInfo()
 
 void TodoApp::ShowLicenseInfo()
 {
-	std::cout << "GNU GPL-3" << std::endl;
+	std::cout << "TodoList Copyright (C) 2023 Conarium Software" << std::endl;
+	std::cout << "This program comes with ABSOLUTELY NO WARRANTY." << std::endl;
+	std::cout << "This is free software, and you are welcome to redistribute it." << std::endl;
+	std::cout << "Licensed under GNU GPL-3. See LICENSE.txt for full license." << std::endl;
 }
 
 void TodoApp::ShowHelpInfo()
 {
-	std::cout << "Todo List Program" << std::endl;
 	std::cout << "Usage: todo [-flags] <message>" << std::endl;
+	std::cout << "Flags:"      << std::endl;
+	std::cout << "--help         Shows this help screen."         << std::endl;
+	std::cout << "--version      Shows current version."          << std::endl;
+	std::cout << "--license      Shows GPL3 Information."         << std::endl;
+	std::cout << "--tag <tag>    Specify a tag on the reminder. " << std::endl;
+	std::cout << "--important    Set tag to IMPORTANT"            << std::endl;
+	std::cout << "--urgent       Set tag to URGENT"               << std::endl;
+	std::cout << "--here         Use file in current directory"   << std::endl;
+	std::cout << "--file <dir>   Specify todofile directory"      << std::endl;
+	std::cout << "--config <dir> Specify configfile directory"    << std::endl;
 }
