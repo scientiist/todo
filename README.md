@@ -64,7 +64,7 @@ The project is built with CMake.
 
 5. If all succeeds, you'll have an executable in your build directory:
 
-`./build/todo`
+`./todo`
 
 ## Contributing
 Feel free to submit issues and pull requests. I'll definitely take a look at them.
