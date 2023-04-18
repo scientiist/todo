@@ -48,17 +48,19 @@ The project is built with CMake.
 
 `cd todo`
 
-3. Create a build directory:
+3. Create a build directory, and enter it:
 
 `mkdir build`
 
+`cd build`
+
 4. Run the CMake configure command, this will setup our build system.
 
-`cmake ./build/`
+`cmake ..`
 
-4. Run the build system, pointed into the `build` directory.
+4. Run the build system.
 
-`cmake --build ./build/`
+`cmake --build .`
 
 5. If all succeeds, you'll have an executable in your build directory:
 
