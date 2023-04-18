@@ -205,7 +205,7 @@ void TodoApp::OutputLine(const char* colorcode, std::string timestamp, std::stri
 			std::cout << FG_RED;
 		if (tag == "IMPORTANT")
 			std::cout << FG_YELLOW;
-		std::cout << "(" << tag << ")";
+		std::cout << "(" << tag << ") ";
 	}
 	std::cout << FG_WHITE << text << std::endl;
 }
