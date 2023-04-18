@@ -102,15 +102,11 @@ private:
 
 TodoApp::TodoApp(int argc, char ** argv)
 {
-
 	home_dir = getenv("HOME");
 	config_path = home_dir + "/" + CONFIG_NAME;
 	file_path = home_dir + "/" + FILE_NAME;
-	if (argc > 1) {
-		// TODO: Fix this fumble here lolol
+	if (argc > 1)
 		args = std::vector<std::string>(argv+1, argv+argc);
-		//args.erase(args.begin());
-	}
 	current_timestamp = get_current_timestamp_str();
 }
 
@@ -138,9 +134,22 @@ bool TodoApp::ParseOptions()
 			args.erase(args.begin()+i);
 			continue;
 		}
-		if (matches(args[i], {"--urgent"}))     { }
-		if (matches(args[i], {"--important"}))  { }
-		if (matches(args[i], {"--tag"}))        { }
+		if (matches(args[i], {"--urgent"}))     {
+			this->tag = "URGENT";
+			args.erase(args.begin()+i);
+			continue;
+		 }
+		if (matches(args[i], {"--important"}))  {
+			this->tag = "IMPORTANT";
+			args.erase(args.begin()+i);
+			continue;
+		}
+		if (matches(args[i], {"--tag"}))        {
+			this->tag = args[i+1]; // TODO: Bounds check
+			args.erase(args.begin()+i);
+			args.erase(args.begin()+i);
+			continue;
+		}
 		if (matches(args[i], {"--file", "-f"})) {
 			this->file_path = args[i+1];
 			args.erase(args.begin()+i);
