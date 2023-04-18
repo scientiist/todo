@@ -41,14 +41,27 @@ Optional --flags are avaliable to use:
 The project is built with CMake.
 
 1. Clone the repository:
+
 `git clone https://github.com/scientiist/todo`
+
 2. Move into the repository directory:
+
 `cd todo`
+
 3. Create a build directory:
+
 `mkdir build`
+
+4. Run the CMake configure command, this will setup our build system.
+
+`cmake ./build/`
+
 4. Run the build system, pointed into the `build` directory.
+
 `cmake --build ./build/`
+
 5. If all succeeds, you'll have an executable in your build directory:
+
 `./build/todo`
 
 ## Contributing
